@@ -1,0 +1,42 @@
+curl.exe -k -i "https://shop.local/api/v1/clients?limit=1&offset=0"
+
+1. ping shop.local
+2. curl.exe -I 'http://shop.local'
+3. curl.exe -k -i 'https://shop.local'
+4. curl.exe -k -I 'https://shop.local/image.png'
+5. curl.exe -k -i 'https://shop.local/api/clients?limit=1&offset=0'
+6. curl.exe -k -i 'https://shop.local/api/v1/clients?limit=1&offset=0'
+7. curl.exe -k -i 'https://shop.local/api/v1'
+8. curl.exe -k -i 'https://shop.local/swagger/index.html'
+9. curl.exe -k -i 'https://shop.local/status'
+10. curl.exe -k -i 'https://shop.local/admin/'
+11. curl.exe -k -i -H "Accept-Encoding: gzip" 'https://shop.local/api/v1/clients?limit=1&offset=0'
+12. curl.exe -k -I -H "Accept-Encoding: gzip" 'https://shop.local/image.png'
+
+
+13. # 20 запросов с вывод порта
+1..20 | ForEach-Object { 
+    $port = (curl.exe -k -i -s "https://shop.local/api/v1/clients?limit=1&offset=0" | Select-String "X-Upstream-Server:\s*127\.0\.0\.1:(\d+)").Matches.Groups[1].Value; 
+    Write-Host "Request $_ -> Port $port" 
+}
+
+
+14. 
+
+
+$response = curl.exe -k -i -s -X POST "https://shop.local/api/v1/clients" -H "Content-Type: application/json" -d '{"clientName":"Test","clientSurname":"Balance","birthday":"2000-01-01","gender":"M","address":{"street":"Test St","city":"Moscow","country":"Russia"}}'
+$port = ($response | Select-String "X-Upstream-Server:\s*127\.0\.0\.1:(\d+)").Matches.Groups[1].Value
+Write-Host "POST -> Port $port" -ForegroundColor Green
+
+
+15. два запроса Swagger для MISS → HIT
+
+
+
+# 1-й запрос (EXPIRED)
+Write-Host "1-й запрос (MISS):" -ForegroundColor Yellow
+curl.exe -k -i -s "https://shop.local/swagger/swagger-ui/index.html" | Select-String "X-Cache-Status"
+
+# 2-й запрос (HIT)
+Write-Host "`n2-й запрос (HIT):" -ForegroundColor Yellow
+curl.exe -k -i -s "https://shop.local/swagger/swagger-ui/index.html" | Select-String "X-Cache-Status"
